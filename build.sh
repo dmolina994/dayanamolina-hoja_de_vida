@@ -5,18 +5,19 @@ set -o errexit
 # Instalar dependencias
 pip install -r requirements.txt
 
-# Recopilar archivos estáticos (CSS, Imágenes)
+# Recopilar archivos estáticos
 python manage.py collectstatic --no-input
 
-# Aplicar migraciones de la base de datos
+# Aplicar migraciones
 python manage.py migrate
 
-
-# ESTO CREA TU USUARIO GRATIS
+# Crear superusuario automáticamente si no existe
 python manage.py shell <<EOF
 from django.contrib.auth import get_user_model
 User = get_user_model()
 if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'dayanamolina@gmail.com', '123')
+    User.objects.create_superuser('admin', 'dayanamolinaQgmail.com', '123')
     print('Usuario creado')
-EOFÑ
+else:
+    print('El usuario ya existe')
+EOF
