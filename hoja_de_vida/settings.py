@@ -68,7 +68,7 @@ WSGI_APPLICATION = "hoja_de_vida.wsgi.application"
 DATABASES = {
     "default": dj_database_url.config(
         # Si no existe DATABASE_URL (local), usa SQLite
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        default='postgresql://postgresql_bd_ck9d_user:ZtbFEcfk7sjJtsx2bITZrvd7CZ7TVPty@dpg-d4v41uqli9vc73dghqlg-a/postgresql_bd_ck9d',
         conn_max_age=600,
     )
 }
