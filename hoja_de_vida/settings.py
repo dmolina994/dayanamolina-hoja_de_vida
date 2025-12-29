@@ -1,24 +1,19 @@
 from pathlib import Path
 import os
-import dj_database_url # [cite: 356]
+import dj_database_url
 
 # Construye rutas dentro del proyecto así: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 🔐 Seguridad
-# En producción, Render proporcionará la SECRET_KEY vía variable de entorno [cite: 315]
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-cambiar-en-produccion")
-
-# DEBUG será False automáticamente al estar en Render [cite: 327, 330]
 DEBUG = "RENDER" not in os.environ 
 
 ALLOWED_HOSTS = []
-# Captura la dirección que el servidor de la nube otorga [cite: 341, 343]
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 else:
-    # Para desarrollo local
     ALLOWED_HOSTS = ["*"]
 
 # 📦 Apps Instaladas
@@ -28,14 +23,16 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "cloudinary_storage", # ☁️ Obligatorio antes de staticfiles
     "django.contrib.staticfiles",
+    "cloudinary",         # ☁️ Obligatorio
     "perfil",
 ]
 
 # ⚙️ Middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware", # Necesario para archivos estáticos [cite: 374]
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -64,11 +61,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "hoja_de_vida.wsgi.application"
 
-# 🗄️ Base de Datos configurada para PostgreSQL en la nube [cite: 356, 359]
+# 🗄️ Base de Datos
+# He quitado la URL fija para que Render la lea de las variables de entorno, como pide el profe.
 DATABASES = {
     "default": dj_database_url.config(
-        # Si no existe DATABASE_URL (local), usa SQLite
-        default='postgresql://postgresql_bd_ck9d_user:ZtbFEcfk7sjJtsx2bITZrvd7CZ7TVPty@dpg-d4v41uqli9vc73dghqlg-a/postgresql_bd_ck9d',
+        default=os.environ.get("DATABASE_URL"),
         conn_max_age=600,
     )
 }
@@ -87,16 +84,24 @@ TIME_ZONE = "America/Guayaquil"
 USE_I18N = True
 USE_TZ = True
 
-# 📁 Archivos Estáticos (CSS, JS) [cite: 372, 374]
+# 📁 Archivos Estáticos (CSS, JS)
 STATIC_URL = "/static/"
-if not DEBUG:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+# 🖼️ CONFIGURACIÓN DE CLOUDINARY
+# Estas variables deben estar en el panel de Render -> Environment
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
 
-# 🖼️ Imágenes (MEDIA)
+# Esto le dice a Django que las fotos van a Cloudinary
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 X_FRAME_OPTIONS = 'SAMEORIGIN'
