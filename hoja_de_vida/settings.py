@@ -2,7 +2,6 @@ from pathlib import Path
 import os
 import dj_database_url
 
-# Construye rutas dentro del proyecto así: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 🔐 Seguridad
@@ -18,21 +17,21 @@ else:
 
 # 📦 Apps Instaladas
 INSTALLED_APPS = [
+    "cloudinary_storage",    # ☁️ Debe ir ANTES de staticfiles para los Media
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "cloudinary_storage", # ☁️ Obligatorio antes de staticfiles
-    "django.contrib.staticfiles",
-    "cloudinary",         # ☁️ Obligatorio
+    "django.contrib.staticfiles", # 📁 Maneja el CSS del Admin
+    "cloudinary",
     "perfil",
 ]
 
 # ⚙️ Middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware", # 🚀 FUNDAMENTAL: Debe ir aquí
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -46,7 +45,7 @@ ROOT_URLCONF = "hoja_de_vida.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, 'templates')], # Asegúrate de que apunte a tus carpetas
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -62,7 +61,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "hoja_de_vida.wsgi.application"
 
 # 🗄️ Base de Datos
-# He quitado la URL fija para que Render la lea de las variables de entorno, como pide el profe.
 DATABASES = {
     "default": dj_database_url.config(
         default=os.environ.get("DATABASE_URL"),
@@ -84,20 +82,27 @@ TIME_ZONE = "America/Guayaquil"
 USE_I18N = True
 USE_TZ = True
 
-# 📁 Archivos Estáticos (CSS, JS)
+# 📁 ARCHIVOS ESTÁTICOS (CSS, JS) - ESTA ES LA PARTE DEL ERROR
 STATIC_URL = "/static/"
+# Carpeta donde Django recolectará todo para producción
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Carpetas donde Django buscará archivos estáticos adicionales
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# Almacenamiento optimizado para Render con WhiteNoise
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# 🖼️ CONFIGURACIÓN DE CLOUDINARY
-# DEBE QUEDAR ASÍ PARA QUE LEA LAS VARIABLES DE ENTORNO
+# 🖼️ CONFIGURACIÓN DE CLOUDINARY (MEDIA)
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# Esto le dice a Django que las fotos van a Cloudinary
+# Solo las fotos subidas van a Cloudinary, el CSS se queda con WhiteNoise
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 MEDIA_URL = '/media/'
