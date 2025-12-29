@@ -92,9 +92,9 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # 🖼️ CONFIGURACIÓN DE CLOUDINARY
 # Estas variables deben estar en el panel de Render -> Environment
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    'CLOUD_NAME': os.environ.get('dbgkg8xgn'),
+    'API_KEY': os.environ.get('C681258254815371'),
+    'API_SECRET': os.environ.get('DeYtc2h0U-r9HE6Sx9q4vyGrRAI'),
 }
 
 # Esto le dice a Django que las fotos van a Cloudinary
